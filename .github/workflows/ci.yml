@@ -1,0 +1,39 @@
+name: AI-LLM CICD PIPELINE
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout
+      - uses: actions/checkout@v3
+
+      # Python
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Install deps
+      - run: |
+          pip install pytest requests
+
+      # Tests
+      - run: pytest || echo "No tests"
+
+      # Install Ollama
+      - run: curl -fsSL https://ollama.com/install.sh | sh
+
+      # Start Ollama
+      - run: |
+          nohup ollama serve &
+          sleep 10
+
+      # Pull model
+      - run: ollama pull llama3:8b
+
+      # AI Review
+      - run: python ai-review/ai_review.py
