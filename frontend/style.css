@@ -1,0 +1,22 @@
+body {
+  background: #0d0d0d;
+  color: #ffaa00;
+  font-family: "Courier New", monospace;
+  text-align: center;
+}
+h1 { color: #ffcc00; }
+.card {
+  background: #1a1a1a;
+  padding: 20px;
+  margin: 20px;
+  border: 1px solid #ffaa00;
+  border-radius: 10px;
+}
+button {
+  background: #ffaa00;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+button:hover { background: #ffcc00; }
