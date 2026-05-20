@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Zomat App 🚀</title>
+  <title>AI LLM CI/CD Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       font-family: Arial;
       margin: 0;
-      background: #f5f5f5;
+      background: #f4f6f9;
     }
 
     header {
-      background: #ff4d4d;
+      background: #1e293b;
       color: white;
       padding: 15px;
       text-align: center;
@@ -19,7 +20,7 @@
     }
 
     .search-bar {
-      padding: 10px;
+      padding: 15px;
       text-align: center;
     }
 
@@ -32,26 +33,31 @@
 
     .container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
       padding: 20px;
     }
 
     .card {
       background: white;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    .rating {
+    .status-success {
       color: green;
+      font-weight: bold;
+    }
+
+    .status-fail {
+      color: red;
       font-weight: bold;
     }
 
     .loading {
       text-align: center;
-      font-size: 20px;
+      font-size: 18px;
       padding: 20px;
     }
   </style>
@@ -59,47 +65,47 @@
 
 <body>
 
-<header>🍽️ Zomat App</header>
+<header>🚀 AI LLM CI/CD Dashboard</header>
 
 <div class="search-bar">
-  <input type="text" id="search" placeholder="Search restaurants..." onkeyup="filterData()">
+  <input type="text" id="search" placeholder="Search project..." onkeyup="filterData()">
 </div>
 
-<div id="loading" class="loading">Loading restaurants...</div>
+<div id="loading" class="loading">Loading project data...</div>
 
 <div id="app" class="container"></div>
 
 <script>
-  let restaurants = [];
+  let projects = [];
 
-  // 🔥 Fake real-time data (later replace with backend API)
-  function loadData() {
-    setTimeout(() => {
-      restaurants = [
-        {name: "Pizza Hub", cuisine: "Italian", rating: 4.5},
-        {name: "Biryani House", cuisine: "Indian", rating: 4.7},
-        {name: "Burger King", cuisine: "Fast Food", rating: 4.2},
-        {name: "Sushi World", cuisine: "Japanese", rating: 4.8},
-        {name: "Taco Fiesta", cuisine: "Mexican", rating: 4.3},
-        {name: "Cafe Coffee Day", cuisine: "Cafe", rating: 4.1},
-        {name: "BBQ Nation", cuisine: "Grill", rating: 4.6},
-      ];
+  async function loadData() {
+    try {
+      const res = await fetch("https://your-backend-url.onrender.com/status");
+      const data = await res.json();
+
+      projects = data;
 
       document.getElementById("loading").style.display = "none";
-      render(restaurants);
-    }, 1000);
+      render(projects);
+    } catch (err) {
+      document.getElementById("loading").innerText = "❌ Failed to load backend data";
+    }
   }
 
   function render(data) {
     const app = document.getElementById("app");
     app.innerHTML = "";
 
-    data.forEach(r => {
+    data.forEach(item => {
+      const buildClass = item.build === "Success" ? "status-success" : "status-fail";
+
       app.innerHTML += `
         <div class="card">
-          <h3>${r.name}</h3>
-          <p>${r.cuisine}</p>
-          <p class="rating">⭐ ${r.rating}</p>
+          <h2>${item.project}</h2>
+          <p>🚀 Deployment: <span class="${buildClass}">${item.status}</span></p>
+          <p>⚙️ Build: <span class="${buildClass}">${item.build}</span></p>
+          <p>🤖 AI Review:</p>
+          <p>${item.ai_review}</p>
         </div>
       `;
     });
@@ -107,9 +113,11 @@
 
   function filterData() {
     const value = document.getElementById("search").value.toLowerCase();
-    const filtered = restaurants.filter(r =>
-      r.name.toLowerCase().includes(value)
+
+    const filtered = projects.filter(p =>
+      p.project.toLowerCase().includes(value)
     );
+
     render(filtered);
   }
 
