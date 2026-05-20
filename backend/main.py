@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# ✅ VERY IMPORTANT (allow frontend access)
+# ✅ Allow frontend access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,15 +12,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Sample restaurant API
-@app.get("/restaurants")
-def get_restaurants():
+# ✅ Health check
+@app.get("/")
+def home():
+    return {"message": "AI LLM CI/CD Backend Running 🚀"}
+
+# ✅ Main dashboard API
+@app.get("/status")
+def get_status():
     return [
-        {"name": "Pizza Hub", "cuisine": "Italian", "rating": 4.5},
-        {"name": "Biryani House", "cuisine": "Indian", "rating": 4.7},
-        {"name": "Burger King", "cuisine": "Fast Food", "rating": 4.2},
-        {"name": "Sushi World", "cuisine": "Japanese", "rating": 4.8},
-        {"name": "Taco Fiesta", "cuisine": "Mexican", "rating": 4.3},
-        {"name": "Cafe Coffee Day", "cuisine": "Cafe", "rating": 4.1},
-        {"name": "BBQ Nation", "cuisine": "Grill", "rating": 4.6},
+        {
+            "project": "ai-llm-cicd-project",
+            "status": "Deployed",
+            "build": "Success",
+            "ai_review": "Code quality is good. CI/CD pipeline working correctly."
+        },
+        {
+            "project": "ai-llm-cicd-project",
+            "status": "Deployed",
+            "build": "Success",
+            "ai_review": "No major issues found. Code is clean and optimized."
+        },
+        {
+            "project": "ai-llm-cicd-project",
+            "status": "Pending",
+            "build": "Running",
+            "ai_review": "AI review in progress..."
+        }
     ]
