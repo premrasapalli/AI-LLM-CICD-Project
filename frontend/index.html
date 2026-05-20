@@ -1,15 +1,120 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI-LLM CICD APP</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Zomat App 🚀</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      background: #f5f5f5;
+    }
+
+    header {
+      background: #ff4d4d;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    .search-bar {
+      padding: 10px;
+      text-align: center;
+    }
+
+    input {
+      padding: 10px;
+      width: 60%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .rating {
+      color: green;
+      font-weight: bold;
+    }
+
+    .loading {
+      text-align: center;
+      font-size: 20px;
+      padding: 20px;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>🚀 AI-LLM CICD APP</h1>
-  <div class="card">
-    <button onclick="callAPI()">Test Backend</button>
-    <pre id="output"></pre>
-  </div>
-  <script src="app.js"></script>
+
+<header>🍽️ Zomat App</header>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="Search restaurants..." onkeyup="filterData()">
+</div>
+
+<div id="loading" class="loading">Loading restaurants...</div>
+
+<div id="app" class="container"></div>
+
+<script>
+  let restaurants = [];
+
+  // 🔥 Fake real-time data (later replace with backend API)
+  function loadData() {
+    setTimeout(() => {
+      restaurants = [
+        {name: "Pizza Hub", cuisine: "Italian", rating: 4.5},
+        {name: "Biryani House", cuisine: "Indian", rating: 4.7},
+        {name: "Burger King", cuisine: "Fast Food", rating: 4.2},
+        {name: "Sushi World", cuisine: "Japanese", rating: 4.8},
+        {name: "Taco Fiesta", cuisine: "Mexican", rating: 4.3},
+        {name: "Cafe Coffee Day", cuisine: "Cafe", rating: 4.1},
+        {name: "BBQ Nation", cuisine: "Grill", rating: 4.6},
+      ];
+
+      document.getElementById("loading").style.display = "none";
+      render(restaurants);
+    }, 1000);
+  }
+
+  function render(data) {
+    const app = document.getElementById("app");
+    app.innerHTML = "";
+
+    data.forEach(r => {
+      app.innerHTML += `
+        <div class="card">
+          <h3>${r.name}</h3>
+          <p>${r.cuisine}</p>
+          <p class="rating">⭐ ${r.rating}</p>
+        </div>
+      `;
+    });
+  }
+
+  function filterData() {
+    const value = document.getElementById("search").value.toLowerCase();
+    const filtered = restaurants.filter(r =>
+      r.name.toLowerCase().includes(value)
+    );
+    render(filtered);
+  }
+
+  loadData();
+</script>
+
 </body>
 </html>
