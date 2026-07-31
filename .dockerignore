@@ -1,0 +1,14 @@
+.venv/
+.venv2/
+__pycache__/
+*.pyc
+data/
+.git/
+.gitignore
+.pytest_cache/
+.coverage
+htmlcov/
+review.json
+review.txt
+frontend/
+.DS_Store

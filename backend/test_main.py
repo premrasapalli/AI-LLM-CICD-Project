@@ -84,6 +84,30 @@ def test_reviews_roundtrip():
     assert body["reviews"][0]["report"]["issues"] == ["minor"]
 
 
+def test_post_review():
+    payload = {
+        "commit_sha": "deadbee",
+        "branch": "feature/ai",
+        "score": 78,
+        "summary": "solid work",
+        "report": {"static": {"files": 3, "checks": [{"label": "Lint", "pass": True}]}, "llm": {"issues": []}},
+    }
+    r = client.post("/reviews", json=payload)
+    assert r.status_code == 201
+    assert r.json()["ok"] is True
+
+    latest = client.get("/reviews").json()["reviews"][0]
+    assert latest["commit_sha"] == "deadbee"
+    assert latest["branch"] == "feature/ai"
+    assert latest["score"] == 78
+    assert latest["summary"] == "solid work"
+
+
+def test_post_review_requires_score():
+    r = client.post("/reviews", json={"report": {}})
+    assert r.status_code == 422
+
+
 def test_ci_runs_stored():
     db.save_ci_runs(FAKE_RUNS["workflow_runs"])
     r = client.get("/ci-runs")

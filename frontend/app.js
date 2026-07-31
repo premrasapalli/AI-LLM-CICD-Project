@@ -96,11 +96,18 @@ function renderOverview(status) {
   $("source-note").appendChild(note);
 }
 
-function render(status) {
+function render(status, history) {
   const reviews = status.latest_review ? [status.latest_review] : [];
   const runs = status.runs || [];
+  const past = history || [];
 
-  $("reviews").innerHTML = `<h2>AI Reviews</h2>` + (reviews.length ? reviews.map(reviewCard).join("") : '<div class="card muted">No AI review yet. Push to main to generate one.</div>');
+  $("reviews").innerHTML = `<h2>Latest AI Review</h2>` + (reviews.length ? reviews.map(reviewCard).join("") : '<div class="card muted">No AI review yet. Push to main to generate one.</div>');
+
+  $("history").innerHTML =
+    `<h2>Review History (${past.length})</h2>` +
+    (past.length
+      ? past.map(reviewCard).join("")
+      : '<div class="card muted">No historical reviews stored in the backend yet.</div>');
 
   $("runs").innerHTML = `<h2>CI Runs</h2>` + (runs.length ? runs.map(runCard).join("") : '<div class="card muted">No CI runs yet.</div>');
 
@@ -118,10 +125,10 @@ function filterData() {
 async function loadData() {
   $("loading").textContent = "Loading project data...";
   try {
-    const status = await fetchJson("/status");
+    const [status, reviewsData] = await Promise.all([fetchJson("/status"), fetchJson("/reviews")]);
     $("loading").style.display = "none";
     renderOverview(status);
-    render(status);
+    render(status, reviewsData.reviews || []);
   } catch (err) {
     $("loading").style.display = "none";
     const errBox = document.createElement("div");
