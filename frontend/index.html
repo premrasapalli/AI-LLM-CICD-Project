@@ -1,82 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>AI LLM CI/CD Dashboard</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      font-family: Arial;
-      margin: 0;
-      background: #f4f6f9;
-    }
-
-    header {
-      background: #1e293b;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-size: 24px;
-    }
-
-    .search-bar {
-      padding: 15px;
-      text-align: center;
-    }
-
-    input {
-      padding: 10px;
-      width: 60%;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    .status-success {
-      color: green;
-      font-weight: bold;
-    }
-
-    .status-fail {
-      color: red;
-      font-weight: bold;
-    }
-
-    .loading {
-      text-align: center;
-      font-size: 18px;
-      padding: 20px;
-    }
-  </style>
+  <title>AI LLM CI/CD Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230d0d0d'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23ffaa00' font-family='monospace'%3E%F0%9F%9A%80%3C/text%3E%3C/svg%3E">
 </head>
-
 <body>
 
-<header>🚀 AI LLM CI/CD Dashboard</header>
+<header>
+  <h1>🚀 AI LLM CI/CD Dashboard</h1>
+  <p class="tagline">GitHub Actions pipeline · Ollama AI review · Render backend</p>
+</header>
 
 <div class="search-bar">
-  <input type="text" id="search" placeholder="Search project..." onkeyup="filterData()">
+  <input type="text" id="search" placeholder="Search commits, runs, reviews..." onkeyup="filterData()">
 </div>
+
+<section class="overview">
+  <div class="stat" id="stat-repo"><span class="stat-label">Repo</span><span class="stat-value">—</span></div>
+  <div class="stat" id="stat-score"><span class="stat-label">AI Score</span><span class="stat-value">—</span></div>
+  <div class="stat" id="stat-last-build"><span class="stat-label">Last build</span><span class="stat-value">—</span></div>
+  <div class="stat" id="stat-lines"><span class="stat-label">Code reviewed</span><span class="stat-value">—</span></div>
+</section>
 
 <div id="loading" class="loading">Loading project data...</div>
 
-<div id="app" class="container"></div>
+<section id="reviews" class="container"></section>
+<section id="runs" class="container"></section>
 
-<!-- ✅ LINK JS FILE -->
+<footer class="footer">
+  <span id="source-note"></span>
+</footer>
+
 <script src="app.js"></script>
-
 </body>
 </html>

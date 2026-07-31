@@ -3,37 +3,94 @@ name: AI-LLM CICD PIPELINE
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+  quality:
+    name: Quality gates (flake8 + coverage)
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      # Python
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      # Install deps
-      - run: |
-          pip install pytest requests
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r backend/requirements-dev.txt
 
-      # Tests
-      - run: pytest || echo "No tests"
+      - name: Lint (flake8)
+        run: flake8 backend ai-review --max-line-length=120 --exclude=backend/__init__.py
 
-      # Install Ollama
-      - run: curl -fsSL https://ollama.com/install.sh | sh
+      - name: Tests + coverage gate (>= 60%)
+        run: pytest backend --cov=backend --cov-report=xml --cov-fail-under=60
 
-      # Start Ollama
-      - run: |
-          nohup ollama serve &
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml
+
+  ai-review:
+    name: AI code review (Ollama)
+    needs: quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install + start Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          nohup ollama serve > /tmp/ollama.log 2>&1 &
           sleep 10
 
-      # Pull model
-      - run: ollama pull llama3:8b
+      - name: Pull model
+        run: ollama pull llama3:8b
 
-      # AI Review
-      - run: python ai-review/ai_review.py
+      - name: Run AI review
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: python ai-review/ai_review.py
+
+      - name: Upload review report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-review-report
+          path: |
+            review.json
+            review.txt
+
+      - name: Comment score on commit
+        if: always() && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SCORE=$(python -c "import json;print(json.load(open('review.json'))['score'])")
+          gh api -X POST "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" \
+            -f body="🤖 AI Review: **$SCORE/100** — full report in the ai-review-report artifact." || \
+            echo "comment failed (non-fatal)"
+
+  docker-build:
+    name: Docker build
+    needs: quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t ai-llm-cicd-app .
